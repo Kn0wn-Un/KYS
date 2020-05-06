@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style = "background-color: #00001a; overflow-y: hidden;">
+  <div class="row align-items-center">
+    <div class="col-md" style = "color: #ffffff;">
+        <p>
+        <h3>KNOW YOUR SURROUNDINGS</h3><br>
+        Think you know your surroundings well?<br>
+        try to guess the location of the given places near you<br>
+        But first we need your location,<br>
+        click below and allow location to the start game<br>
+        STAY HOME<br>
+        STAY SAFE<br>
+        <p id="demo" onclick="getLocation()" style="color: red;">Click me to allow location.</p><br>
+        <form action = "/" method = "POST" id="form">
+        <input class="form-control invisible" type="text" name="loc" id ="loc">
+        <button type="submit" class="btn btn-primary" disabled id="play">Play!</button>
+        </form>
+        </p>
+    </div>
+    <div class="col-md-auto p-0 m-0">
+      <img src = "/static/index2.jpeg" alt = "Earth" height = "1000" width = "flex">
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+
+<script>
+function geoError(error)
+{
+  if (error.code == 1)
+  {
+    document.getElementById("loc").value = error.code;
+    document.getElementById("form").submit();
+  }
+    // error.code can be:
+    //   0: unknown error
+    //   1: permission denied
+    //   2: position unavailable (error response from location provider)
+    //   3: timed out
+}
+function getLocation()
+{
+  var x;
+  if (navigator.geolocation)
+  {
+    navigator.geolocation.getCurrentPosition(showPosition, geoError);
+  }
+  else
+  {
+    x = "Geolocation is not supported by this browser.";
+    document.getElementById("loc").value = x;
+  }
+}
+
+function showPosition(position) {
+  if (position.coords.latitude != "" && position.coords.longitude != "")
+  {
+    x = position.coords.latitude + " " + position.coords.longitude;
+    document.getElementById("loc").value = x;
+    var button = document.getElementById("play");
+    button.disabled = false;
+  }
+}
+</script>
+
+{% endblock %}

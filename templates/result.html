@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block style %}
+    <meta name="viewport" content="user-scalable=no">
+
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 75%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+        <div id="map"></div>
+        <div class="container-fluid" style="background-color: #00001a; color:white;">
+            <div class="row align-items-center">
+                <div class="col">
+                  <h5>Places to find:</h5>
+                  <ol>
+                    {% for i in places %}
+                    <li>{{ i['name'] }}</li>
+                    {% endfor %}
+                  </ol>
+                </div>
+                <div class="col">
+                  <h5>Difference in distance:</h5>
+                  <ol>
+                    {% for i in dist %}
+                    <li>{{ i }} KMS</li>
+                    {% endfor %}
+                  </ol>
+                </div>
+                <div class="col">
+                  <h5>Well Done!</h5>
+                  <a class="btn btn-primary" href="/" role="button">Home</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+
+{% block script %}
+    <script>
+      var markers = [];
+      var ctr = 0;
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: {{ lat }}, lng: {{ lng }} },
+          zoom: 15
+        });
+        
+        placeMarkerUser(map);
+        placeMarkerAnswer(map);
+      }
+
+      function placeMarkerUser(map) 
+      {
+        var coord = {{ coord|safe }}
+        console.log(coord);
+        for(i = 0, ctr = 1; i <= 8; i += 2, ctr++)
+        {
+          var myLatlng = new google.maps.LatLng(coord[i], coord[i + 1]);
+          console.log(coord[i] +" "+ coord[i + 1]);
+          var image = 'https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_yellow'+ctr.toString()+'.png';
+          var marker = new google.maps.Marker({
+              position: myLatlng,
+              icon: image,
+          });
+          marker.setMap(map);
+        }
+      }  
+      
+      function placeMarkerAnswer(map)
+      {
+        var ans = {{ ans|safe }}
+        console.log(ans);
+        for(i = 0, ctr = 1; i <= 8; i += 2, ctr++)
+        {
+          var myLatlng = new google.maps.LatLng(ans[i], ans[i + 1]);
+          var marker = new google.maps.Marker({
+              position: myLatlng,
+              label: ctr.toString()
+          });
+          marker.setMap(map);
+        }
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFweg0RNel-43y0l85djHglrUwH4BxkTQ&libraries=drawing&callback=initMap"
+    async defer></script>
+{% endblock %}

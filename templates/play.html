@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block title %}Play{% endblock %}
+
+{% block style %}
+    <meta name="viewport" content="user-scalable=no">
+
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 75%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+        <div id="map"></div>
+        <div class="container-fluid" style="background-color: #00001a; color:white;">
+            <div class="row align-items-center">
+                <div class="col">
+                  <h5>Places to find:</h5>
+                  <ol>
+                    {% for i in places %}
+                    <li>{{ i['name'] }}</li>
+                    {% endfor %}
+                  </ol>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-success" disabled id="done" onclick="done()">Done!</button>
+                  <form action="/result" method="POST" id="form">
+                    <input class="form-control invisible" type="text" name="0" id ="0">
+                    <input class="form-control invisible" type="text" name="1" id ="1">
+                    <input class="form-control invisible" type="text" name="2" id ="2">
+                    <input class="form-control invisible" type="text" name="3" id ="3">
+                    <input class="form-control invisible" type="text" name="4" id ="4">
+                  </form>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+
+{% block script %}
+    <script>
+      var markers = [];
+      var ctr = 0;
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: {{ lat }}, lng: {{ lng }} },
+          zoom: 15,
+          styles: [
+                      {
+                        "featureType": "administrative",
+                        "elementType": "geometry",
+                        "stylers": [
+                          {
+                            "visibility": "off"
+                          }
+                        ]
+                      },
+                      {
+                        "featureType": "poi",
+                        "stylers": [
+                          {
+                            "visibility": "off"
+                          }
+                        ]
+                      },
+                      {
+                        "featureType": "road",
+                        "elementType": "labels.icon",
+                        "stylers": [
+                          {
+                            "visibility": "off"
+                          }
+                        ]
+                      },
+                      {
+                        "featureType": "transit",
+                        "stylers": [
+                          {
+                            "visibility": "off"
+                          }
+                        ]
+                      }
+                    ]
+        });
+
+        map.addListener('click', function(e) {
+          placeMarker(e.latLng, map);
+        });
+      }
+
+      function placeMarker(latLng, map) {
+        if(ctr >= 4)
+        {
+          console.log(" " + markers[0].position);
+          var button = document.getElementById("done");
+          button.disabled = false;
+          if(ctr > 4)
+            return;
+        }
+          var image = 'https://raw.githubusercontent.com/Concept211/Google-Maps-Markers/master/images/marker_yellow'+(ctr + 1).toString()+'.png';
+          var marker = new google.maps.Marker({
+          position: latLng,
+          draggable:true,
+          icon: image
+        });
+        if(markers[ctr] != null)
+          {
+            markers[ctr].setMap(null);
+          }
+        marker.setMap(map);
+        markers[ctr] = marker;
+        ctr++;
+      }
+      
+      function done()
+      {
+        for(i = 0; i < 5; i++)
+        {
+          var pos = markers[i].position.toString();
+          document.getElementById(i.toString()).value = pos;
+        }
+        document.getElementById("form").submit();
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFweg0RNel-43y0l85djHglrUwH4BxkTQ&libraries=drawing&callback=initMap"
+    async defer></script>
+{% endblock %}
